@@ -1,0 +1,1 @@
+ while position < horizontal_length and velocity > 0:
