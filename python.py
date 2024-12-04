@@ -1,109 +1,139 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 
-def simulate_coaster_with_initial_thrust(mass, angle_deg, initial_force, thrust_distance, friction_coefficient, horizontal_length, ramp_length):
-    """
-    Simulates motion of a rollercoaster with an initial thrust over a horizontal track and a ramp.
+# Runge-Kutta Method
+def runge_kutta(f, y0, t0, t1, h):
+    n = int((t1 - t0) / h)
+    t = t0
+    y = y0
+    result = [(t, y)]
     
-    Parameters:
-    - mass: Mass of the rollercoaster in kg
-    - angle_deg: Ramp angle in degrees
-    - initial_force: Force provided by the actuator in Newtons
-    - thrust_distance: Distance over which the actuator provides thrust in meters
-    - friction_coefficient: Coefficient of friction
-    - horizontal_length: Length of the horizontal track in meters
-    - ramp_length: Length of the ramp in meters
+    for i in range(n):
+        k1 = h * f(t, y)
+        k2 = h * f(t + h / 2, y + k1 / 2)
+        k3 = h * f(t + h / 2, y + k2 / 2)
+        k4 = h * f(t + h, y + k3)
+        
+        y += (k1 + 2 * k2 + 2 * k3 + k4) / 6
+        t += h
+        result.append((t, y))
     
-    Returns:
-    - success: True if the rollercoaster reaches the top of the ramp, False otherwise
-    - positions: List of positions over time
-    - times: List of time steps
-    """
-    # Constants
-    g = 9.8  # Acceleration due to gravity in m/s^2
-    angle_rad = np.radians(angle_deg)
-    
-    # Friction force
-    friction_force_horizontal = friction_coefficient * mass * g
-    friction_force_ramp = friction_coefficient * mass * g * np.cos(angle_rad)
-    
-    # Calculate velocity from initial thrust
-    net_force_horizontal = initial_force - friction_force_horizontal
-    if net_force_horizontal > 0:
-        acceleration = net_force_horizontal / mass
-        velocity = np.sqrt(2 * acceleration * thrust_distance)  # v^2 = 2 * a * d
+    return result
+
+# Parameters
+mass = 500  # kg
+u = 0.1  # coefficient of friction
+g = 9.81  # m/s^2
+thrust_provided_by_launcher = 8000  # N
+distance_thrust_is_applied = 3  # m
+
+# Track Dimensions
+x1 = 10  # flat
+x2 = 10  # incline
+x3 = 10  # flat after incline
+theta = 30  # incline angle (degrees)
+
+def get_angle_from_x_position(x):
+    if x <= x1:
+        return 0
+    elif x <= x1 + x2:
+        return theta
     else:
-        velocity = 0  # No movement if force is insufficient
-    
-    # Check if the rollercoaster can climb the ramp
-    potential_energy_ramp = mass * g * (ramp_length * np.sin(angle_rad))  # m * g * h
-    work_against_friction = friction_force_ramp * ramp_length  # F * d
-    kinetic_energy = 0.5 * mass * velocity**2  # KE = 1/2 m v^2
-    
-    can_climb = kinetic_energy >= (potential_energy_ramp + work_against_friction)
-    
-    # Simulate positions for visualization
-    positions = []
-    times = []
-    time_step = 0.1  # Iterate every 1 second
-    position = 0
-    time = 0
-    
-    # Plot setup
-    plt.figure(figsize=(10, 6))
-    plt.plot([0, horizontal_length], [0, 0], 'k-', label="Horizontal Track")  # Horizontal track
-    plt.plot([horizontal_length, horizontal_length + ramp_length * np.cos(angle_rad)], 
-             [0, ramp_length * np.sin(angle_rad)], 'k-', label="Ramp")  # Ramp
-    plt.xlabel("Horizontal Distance (m)")
-    plt.ylabel("Vertical Distance (m)")
-    plt.title("Rollercoaster Motion with Initial Thrust")
-    plt.legend()
-    plt.grid()
-    
-    # Horizontal motion
-    while position < horizontal_length and velocity > 0:
-        positions.append(position)
-        times.append(time)
-        plt.plot(position, 0, 'ro')  # Rollercoaster as red circle
-        plt.pause(1)  # Pause to simulate motion
-        plt.draw()  # Update the plot
-        position += velocity * time_step
-        time += time_step
-    
-    # Ramp motion
-    while position < (horizontal_length + ramp_length * np.cos(angle_rad)) and velocity > 0:
-        positions.append(position)
-        times.append(time)
-        height = (position - horizontal_length) * np.tan(angle_rad)
-        plt.plot(position, height, 'ro')  # Rollercoaster as red circle
-        plt.pause(0.5)  # Pause to simulate motion
-        plt.draw()  # Update the plot
-        position += velocity * time_step  # Assume constant velocity for simplicity
-        time += time_step
-        # Update velocity due to gravity and friction
-        velocity -= (g * np.sin(angle_rad) + friction_force_ramp / mass) * time_step
-    
-    success = position >= (horizontal_length + ramp_length * np.cos(angle_rad))
-    
-    plt.show()
-    return success, positions, times
+        return 0
 
-# Inputs
-mass = 500  # Mass in kg
-angle_deg = 30  # Ramp angle in degrees
-initial_force = 4500  # Force from the actuator in Newtons
-thrust_distance = 10  # Distance over which the actuator provides thrust in meters
-friction_coefficient = 0.1  # Coefficient of friction
-horizontal_length = 50  # Horizontal track length in meters
-ramp_length = 20  # Ramp length in meters
+def acceleration(t, v):
+    x = v * t if t > 0 else 0  # Calculate position from velocity
+    angle = get_angle_from_x_position(x)
+    thrust = thrust_provided_by_launcher if x <= distance_thrust_is_applied else 0
+    drag = u * mass * g * np.cos(np.radians(angle))
+    gravity = mass * g * np.sin(np.radians(angle))
+    net_force = thrust - drag - gravity
+    return net_force / mass
 
-# Simulation
-success, positions, times = simulate_coaster_with_initial_thrust(
-    mass, angle_deg, initial_force, thrust_distance, friction_coefficient, horizontal_length, ramp_length
-)
+# Solve Velocity with Runge-Kutta
+result = runge_kutta(acceleration, 0, 0, 5, 0.01)
+t, v = zip(*result)
 
-# Output results
-if success:
-    print("The rollercoaster successfully climbs the ramp!")
-else:
-    print("The rollercoaster fails to climb the ramp.")
+# Calculate Cumulative Distance
+distances = [0]
+for i in range(1, len(v)):
+    distances.append(distances[-1] + v[i] * (t[i] - t[i - 1]))
+
+def get_position(distance):
+    if distance <= x1:
+        return distance, 0
+    elif distance <= x1 + x2:
+        x = x1 + (distance - x1) * np.cos(np.radians(theta))
+        y = (distance - x1) * np.sin(np.radians(theta))
+        return x, y
+    else:
+        x = x1 + x2 * np.cos(np.radians(theta)) + (distance - x1 - x2)
+        y = x2 * np.sin(np.radians(theta))
+        return x, y
+
+# Stopping Condition
+stop_time, stop_x, stop_y = None, None, None
+for i in range(len(t)):
+    if v[i] <= 1e-3:  # Near-zero velocity threshold
+        stop_time = t[i]
+        stop_x, stop_y = get_position(distances[i])
+        print(f"Roller coaster stops at t={stop_time:.2f}s at position (x,y)=({stop_x:.2f},{stop_y:.2f})m")
+        break
+
+# Check if the cart completes the track
+if stop_time is None and distances[-1] >= x1 + x2 + x3:
+    stop_time = t[-1]
+    stop_x, stop_y = get_position(x1 + x2 + x3)
+    print(f"Roller coaster completes the track at t={stop_time:.2f}s at position (x,y)=({stop_x:.2f},{stop_y:.2f})m")
+elif stop_time is None:
+    stop_time = t[-1]
+    stop_x, stop_y = get_position(distances[-1])
+    print(f"Roller coaster stops at t={stop_time:.2f}s at position (x,y)=({stop_x:.2f},{stop_y:.2f})m")
+
+# Plot Velocity over Time
+plt.figure()
+plt.plot(t, v, label='Velocity (m/s)')
+plt.xlabel('Time (s)')
+plt.ylabel('Velocity (m/s)')
+plt.title('Velocity vs Time')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# Plot Distance over Time
+plt.figure()
+plt.plot(t, distances, label='Distance (m)')
+plt.xlabel('Time (s)')
+plt.ylabel('Distance (m)')
+plt.title('Distance vs Time')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# Animation
+fig, ax = plt.subplots()
+ax.set_xlim(0, x1 + x2 * np.cos(np.radians(theta)) + x3)
+ax.set_ylim(0, x2 * np.sin(np.radians(theta)) + 1)
+ax.set_xlabel('Distance (m)')
+ax.set_ylabel('Height (m)')
+ax.set_title('Roller Coaster Simulation')
+
+# Plot Track
+track_x = [0, x1, x1 + x2 * np.cos(np.radians(theta)), x1 + x2 * np.cos(np.radians(theta)) + x3]
+track_y = [0, 0, x2 * np.sin(np.radians(theta)), x2 * np.sin(np.radians(theta))]
+ax.plot(track_x, track_y, 'k-')
+
+cart, = ax.plot([], [], 'ro', markersize=8)
+
+def update(frame):
+    if frame < len(t):
+        x_pos, y_pos = get_position(distances[frame])
+        cart.set_data([x_pos], [y_pos])
+    else:
+        cart.set_data([stop_x], [stop_y])  # Final position if animation ends
+    return cart,
+
+anim = FuncAnimation(fig, update, frames=len(t) + 1, interval=10, blit=True)
+
+plt.show()
