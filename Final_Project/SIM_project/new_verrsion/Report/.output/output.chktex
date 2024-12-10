@@ -1,0 +1,2 @@
+main.tex:444:1: Error: `itemize' expected, found `document'. \end{document} 
+main.tex:11:1: Warning: No match found for `document'. \begin{document}  
