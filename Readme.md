@@ -59,7 +59,7 @@ Simulation software plays a critical role in engineering design, offering a cost
 ## Installation
 Clone this repository:
 ```bash
-git clone [https://github.com/<your-username>/rollercoaster-simulation.git](https://github.com/bk-poudel/Simulation_software_in-Robotics_Project.git
+git clone https://github.com/bk-poudel/Simulation_software_in-Robotics_Project.git
 cd rollercoaster-simulation
 ```
 
