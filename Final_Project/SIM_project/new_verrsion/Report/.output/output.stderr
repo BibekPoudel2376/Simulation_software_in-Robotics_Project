@@ -1,9 +1,0 @@
-ChkTeX v1.7.8 - Copyright 1995-96 Jens T. Berger Thielemann.
-Compiled with PCRE regex support.
-One error printed; One warning printed; 455 user suppressed warnings; No line suppressed warnings.
-See the manual for how to suppress some or all of these warnings/errors.
-The manual is available at https://www.nongnu.org/chktex/ChkTeX.pdf
-Latexmk: Important warning:
-  (\end occurred inside a group at level 1)
-Latexmk: Important warning:
-  (\end occurred inside a group at level 1)
