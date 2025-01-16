@@ -73,6 +73,7 @@ Open and configure the simulation files in MATLAB/Simulink and SolidWorks as nee
 
 ## Outputs
 The simulation provides:
+-Animation of rollercoaster motion over the track
 - Graphs for acceleration, velocity, and position over time.
 - Force analysis (gravitational, frictional, air resistance).
 - Feedback on motor thrust adequacy.
