@@ -54,18 +54,11 @@ Simulation software plays a critical role in engineering design, offering a cost
 ## Prerequisites
 - MATLAB/Simulink
 - Python (recommended version >= 3.8)
-- SolidWorks
 
 ## Installation
 Clone this repository:
 ```bash
-git clone https://github.com/bk-poudel/rollercoaster-simulation.git
-cd rollercoaster-simulation
-```
-
-Install Python dependencies:
-```bash
-pip install -r requirements.txt
+git clone https://github.com/bk-poudel/Roller-Coaster-Simulation.git
 ```
 
 Open and configure the simulation files in MATLAB/Simulink and SolidWorks as needed.
