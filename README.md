@@ -60,7 +60,7 @@ Clone this repository:
 git clone https://github.com/bk-poudel/Roller-Coaster-Simulation.git
 ```
 
-Open and configure the simulation files in MATLAB/Simulink and SolidWorks as needed.
+Open and configure the simulation files in MATLAB/Simulink as needed.
 
 ## Usage
 1. Define the motor and environmental parameters in the `parameters.py` or Simulink model.
