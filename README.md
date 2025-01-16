@@ -53,7 +53,6 @@ Simulation software plays a critical role in engineering design, offering a cost
 
 ## Prerequisites
 - MATLAB/Simulink
-- Python (recommended version >= 3.8)
 
 ## Installation
 Clone this repository:
@@ -67,7 +66,6 @@ Open and configure the simulation files in MATLAB/Simulink and SolidWorks as nee
 1. Define the motor and environmental parameters in the `parameters.py` or Simulink model.
 2. Set up the track profile in the provided scripts or SolidWorks model.
 3. Run the simulations:
-     - Python: `python simulate.py`
      - MATLAB/Simulink: Open and run `rollercoaster_sim.slx`.
 4. Analyze outputs for acceleration, velocity, position, and force breakdowns.
 
